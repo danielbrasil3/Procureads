@@ -1,12 +1,18 @@
 {
   "extends": [
     "next",
-    "next/core-web-vitals"
+    "next/core-web-vitals",
+    "plugin:react/recommended"
   ],
-  "plugins": ["@next/next"],
+  "plugins": [
+    "react"
+  ],
   "settings": {
     "react": {
       "version": "detect"
     }
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off"
   }
 }
