@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 export default function AdsPage() {
-  const { setTheme, theme } = useTheme()
+  const { setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
   // Wait for client-side rendering

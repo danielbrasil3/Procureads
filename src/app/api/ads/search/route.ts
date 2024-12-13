@@ -1,5 +1,20 @@
 import { NextResponse } from 'next/server'
 
+
+interface Ad {
+  id: string;
+  ad_creative_link_titles?: string[];
+  ad_creative_bodies?: string[];
+  status: string;
+  call_to_action_type: string;
+  page_id: string;
+  page_name: string;
+  ad_creative_link_url: string;
+  ad_creation_time: string;
+  ad_delivery_start_time: string;
+}
+
+
 export async function POST(request: Request) {
   try {
     const { searchTerm, adType = 'FINANCIAL_PRODUCTS_AND_SERVICES_ADS' } = await request.json()
@@ -38,7 +53,7 @@ export async function POST(request: Request) {
       throw new Error(`Formato de resposta inesperado: ${JSON.stringify(data)}`)
     }
     
-    const transformedData = data.data.map((ad: any) => ({
+    const transformedData = data.data.map((ad: Ad) => ({
       id: ad.id,
       title: ad.ad_creative_link_titles?.[0] || 'Anúncio sem título',
       body: ad.ad_creative_bodies?.[0] || 'Sem descrição disponível',
