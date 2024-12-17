@@ -103,7 +103,7 @@ export default function LandingPage() {
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-muted-foreground">© 2023 AnalisadorDeAnúncios. Todos os direitos reservados.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-xs hover:text-primary transition-colors" href="#">
+          <Link href="/termos-de-servico" className="text-xs hover:text-primary transition-colors">
             Termos de Serviço
           </Link>
           <Link href="/politica-de-privacidade" className="text-xs hover:text-primary transition-colors">
