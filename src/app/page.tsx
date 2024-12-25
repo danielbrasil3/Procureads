@@ -1,117 +1,188 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Facebook, BarChart2, TrendingUp, DollarSign } from 'lucide-react'
-import Link from "next/link"
-import { ThemeToggle } from "@/components/theme-toggle"
+// page.tsx - Revisado com autenticação original e otimizações específicas para Next.js
+import dotenv from 'dotenv';
+dotenv.config(); // Carrega o arquivo .env
 
-export default function LandingPage() {
+import Link from 'next/link';
+import { Suspense, lazy } from 'react';
+import { Button } from "@/components/ui/button";
+import { ChevronRight, BarChart, Search, TrendingUp, MenuIcon } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Subscription } from '@/lib/subscription';
+
+const PricingCard = lazy(() => import('@/components/pricingcard'));
+
+export default async function LandingPage() {
+  const subscription = await Subscription()
+
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <header className="px-4 lg:px-6 h-16 flex items-center border-b">
-        <Link className="flex items-center justify-center" href="#">
-          <Facebook className="h-6 w-6 text-primary" />
-          <span className="ml-2 text-2xl font-bold">Procure Ads</span>
-        </Link>
-        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:text-primary transition-colors" href="#recursos">
-            Recursos
-          </Link>
-          <Link className="text-sm font-medium hover:text-primary transition-colors" href="#precos">
-            Preços
-          </Link>
-          <Link className="text-sm font-medium hover:text-primary transition-colors" href="#contato">
-            Contato
-          </Link>
-          <ThemeToggle />
+    <main className="bg-background/10 text-foreground">
+      <section className="container mx-auto text-center pb-20 px-4 md:px-0">
+        <nav className="flex justify-between items-center py-6">
+          <div className='flex gap-4'>
+            <Link href="/" className="flex items-center justify-center ml-5">
+              <span className="font-bold text-2xl ">Procure Ads</span>
+            </Link>
+            <ThemeToggle />
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="md:hidden">
+              <MenuIcon size={24} className="cursor-pointer" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="mr-4">
+              <DropdownMenuLabel>Menu</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link href="#funcionamento">Funcionamento</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="#preco">Preço</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="/login">
+                  <Button variant='outline' className="w-full">Login</Button>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <div className="items-center gap-4 hidden md:flex">
+            <Link href="#funcionamento">
+              <Button variant="link">Funcionamento</Button>
+            </Link>
+            <Link href="#preco">
+              <Button variant="link">Preço</Button>
+            </Link>
+            {subscription && (
+              <Link href="/dashboard">
+                <Button>Dashboard</Button>
+              </Link>
+            )}
+            {!subscription && (
+              <Link href="/login">
+                <Button>Login</Button>
+              </Link>
+            )}
+          </div>
         </nav>
-      </header>
-      <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-secondary">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Descubra os Anúncios do Facebook Mais Populares
-                </h1>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                  Obtenha insights dos anúncios de melhor desempenho no Facebook e impulsione sua estratégia de marketing.
-                </p>
+        <section>
+          <h1 className="md:text-6xl text-3xl font-bold md:font-bold mt-16 md:mt-24 leading-tight">
+            Descubra os Anúncios Mais Escalados <br/> no Meta Ads
+          </h1>
+          <p className="text-muted-foreground mt-6 text-base md:text-xl max-w-3xl mx-auto">
+            Otimize suas campanhas no Facebook e Instagram com insights poderosos dos anúncios de maior sucesso no mercado.
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/cadastro">
+              <Button size="lg" className="w-full sm:w-auto">
+                Comece Gratuitamente <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>       
+            <Link href="/login">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                Já tenho uma conta
+              </Button>
+            </Link>
+          </div>
+          <p className="md:text-sm text-xs text-muted-foreground mt-4">
+            Experimente a versão gratuita ou faça a assinatura. Cancele quando quiser.
+          </p>
+        </section>
+      </section>
+      <section id="funcionamento" className="bg-muted/40 py-20 text-center">
+        <div className="container px-4 md:px-6">
+          <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-12">
+            Como o Procure Ads Funciona
+          </h2>
+          <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Search className="h-8 w-8 text-primary" />
               </div>
-              <div className="space-x-4">
-                <Link href={"/ads"}><Button>Começar Agora</Button></Link>
-                <Button variant="outline">Saiba Mais</Button>
+              <h3 className="text-xl font-semibold">Busca Inteligente</h3>
+              <p className="text-muted-foreground max-w-sm text-sm">
+                Encontre rapidamente os anúncios mais relevantes e bem-sucedidos no Meta Ads.
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-4">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <BarChart className="h-8 w-8 text-primary" />
               </div>
+              <h3 className="text-xl font-semibold">Análise Detalhada</h3>
+              <p className="text-muted-foreground max-w-sm text-sm">
+                Obtenha insights profundos sobre o desempenho e as características dos anúncios de sucesso.
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-4">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <TrendingUp className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-semibold">Otimização de Campanhas</h3>
+              <p className="text-muted-foreground max-w-sm text-sm">
+                Use os dados para melhorar suas próprias campanhas e aumentar o ROI.
+              </p>
             </div>
           </div>
-        </section>
-        <section id="recursos" className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mb-12">Principais Recursos</h2>
-            <div className="grid gap-6 lg:grid-cols-3 lg:gap-12">
-              <Card>
-                <CardHeader>
-                  <BarChart2 className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>Análise de Desempenho de Anúncios</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Obtenha insights detalhados sobre os anúncios de melhor desempenho em várias indústrias e demografias.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <TrendingUp className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>Identificação de Tendências</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Mantenha-se à frente identificando tendências emergentes em campanhas de anúncios bem-sucedidas no Facebook.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <DollarSign className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>Otimização de ROI</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Maximize seu investimento em anúncios aprendendo com as campanhas mais eficazes do seu setor.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
-        <section id="cta" className="w-full py-12 md:py-24 lg:py-32 bg-primary text-primary-foreground">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  Pronto para Otimizar seus Anúncios no Facebook?
-                </h2>
-                <p className="mx-auto max-w-[600px] md:text-xl opacity-90">
-                  Junte-se a milhares de profissionais de marketing que já estão aproveitando nossos insights para criar campanhas vencedoras.
-                </p>
-              </div>
-              <Button className="bg-background text-foreground hover:bg-secondary">Inicie seu Teste Gratuito</Button>
-            </div>
-          </div>
-        </section>
-      </main>
-      <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
-        <p className="text-xs text-muted-foreground">© 2023 AnalisadorDeAnúncios. Todos os direitos reservados.</p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link href="/termos-de-servico" className="text-xs hover:text-primary transition-colors">
-            Termos de Serviço
+        </div>
+        <div className="mt-16">
+          <Link href="/cadastro">
+            <Button size="lg">
+              Comece a Otimizar Seus Anúncios
+            </Button>
           </Link>
-          <Link href="/politica-de-privacidade" className="text-xs hover:text-primary transition-colors">
-            Política de Privacidade
+        </div>
+      </section>
+      <section id="preco" className="py-20 text-center px-4">
+        <h2 className="text-3xl md:text-5xl font-bold mb-6">
+          Plano Simples e Transparente
+        </h2>
+        <p className="text-muted-foreground text-base md:text-xl max-w-3xl mx-auto mb-12">
+          Um único plano com tudo o que você precisa para impulsionar suas campanhas de anúncios.
+        </p>
+        <div className="flex justify-center">
+          <Suspense fallback={<div>Loading...</div>}>
+            <PricingCard />
+          </Suspense>
+        </div>
+      </section>
+      {!subscription && (
+        <section className="bg-muted py-20 text-center">
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">
+            Pronto Para Revolucionar Suas Campanhas?
+          </h2>
+          <p className="text-muted-foreground text-base md:text-xl max-w-3xl mx-auto mb-10">
+            Junte-se a milhares de profissionais de marketing que já estão otimizando seus anúncios com o Procure Ads.
+          </p>
+          <Link href="/cadastro">
+            <Button size="lg">
+              Comece Agora
+            </Button>
           </Link>
-        </nav>
-      </footer>
-    </div>
-  )
-}
+          <p className="md:text-sm text-xs text-muted-foreground mt-4">
+            Comece sua assinatura agora mesmo. Cancele quando quiser.
+          </p>
+        </section>
+      )}
 
+      <footer className="py-12 text-center">
+        <div className="container mx-auto px-4">
+          <p className="text-muted-foreground mb-4">© 2024 Procure Ads. Todos os direitos reservados.</p>
+          <nav className="flex justify-center gap-6">
+            <Link href="/termos-de-servico" className="text-sm text-muted-foreground hover:text-primary">
+              Termos de Serviço
+            </Link>
+            <Link href="/politica-de-privacidade" className="text-sm text-muted-foreground hover:text-primary">
+              Política de Privacidade
+            </Link>
+          </nav>
+        </div>
+      </footer>
+    </main>
+  );
+}

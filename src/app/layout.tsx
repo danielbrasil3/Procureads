@@ -1,25 +1,25 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider"
+import './globals.css'
+import { AuthProvider, ThemeProvider } from '@/components/providers'
 
+export const metadata = {
+  title: 'Procure Ads',
+  description: 'Descubra os anúncios mais escalados no Meta Ads',
+}
 
-export const metadata: Metadata = {
-  title: "Procure Ads",
-  description: "Encontre os anuncios mais escalados",
-};
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="pt-br" suppressHydrationWarning>
-      <body className="font-whitney">
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className='font-whitney'>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }
+

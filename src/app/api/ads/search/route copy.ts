@@ -10,20 +10,20 @@ async function searchAds(accessToken: string, searchParams: URLSearchParams) {
       },
     }
   )
-  
+
   if (!response.ok) {
     const errorData = await response.json()
     throw new Error(`Erro na API do Facebook: ${JSON.stringify(errorData)}`)
   }
-  
+
   return await response.json()
 }
 
 export async function POST(request: Request) {
   try {
-    const { searchTerm, adType = 'FINANCIAL_PRODUCTS_AND_SERVICES_ADS', isVIP } = await request.json()
+    const { searchTerm, adType = 'FINANCIAL_PRODUCTS_AND_SERVICES_ADS' } = await request.json()
     
-    console.log('Parâmetros de busca:', { searchTerm, adType, isVIP })
+    console.log('Parâmetros de busca:', { searchTerm, adType })
   
     const accessToken = process.env.FACEBOOK_ACCESS_TOKEN
   
@@ -31,14 +31,15 @@ export async function POST(request: Request) {
       throw new Error('Token de acesso do Facebook não está configurado')
     }
     
+    // First search
     const initialSearchParams = new URLSearchParams({
       access_token: accessToken,
       search_terms: searchTerm,
       ad_type: adType,
-      ad_reached_countries: 'US,BR',
+      ad_reached_countries: 'US,BR', // Add US as a fallback
       ad_active_status: 'ACTIVE',
       fields: 'id,page_id,page_name',
-      limit: isVIP ? '1000' : '100', // Limit results for free users
+      limit: '1000',
       order_by: 'creation_time_desc'
     })
     
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
     try {
       initialData = await searchAds(accessToken, initialSearchParams)
     } catch (error) {
+      // If the first attempt fails, try without specifying ad_type
       console.log('Primeira tentativa falhou, tentando sem ad_type')
       initialSearchParams.delete('ad_type')
       initialData = await searchAds(accessToken, initialSearchParams)
@@ -54,7 +56,8 @@ export async function POST(request: Request) {
     if (!initialData.data || !Array.isArray(initialData.data)) {
       throw new Error(`Formato de resposta inesperado: ${JSON.stringify(initialData)}`)
     }
-  
+
+    // Group ads by page and filter pages with more than 20 ads
     const pageGroups = initialData.data.reduce((groups: { [key: string]: any }, ad: any) => {
       if (!groups[ad.page_id]) {
         groups[ad.page_id] = { pageId: ad.page_id, pageName: ad.page_name, count: 0 }
@@ -62,26 +65,28 @@ export async function POST(request: Request) {
       groups[ad.page_id].count++
       return groups
     }, {})
-  
-    const relevantPages = Object.values(pageGroups).filter((page: any) => page.count > (isVIP ? 20 : 10))
-  
+
+    const relevantPages = Object.values(pageGroups).filter((page: any) => page.count > 20)
+
+    // Second search for relevant pages
     const finalResults = await Promise.all(relevantPages.map(async (page: any) => {
       const pageSearchParams = new URLSearchParams({
         access_token: accessToken,
         search_page_ids: page.pageId,
-        ad_reached_countries: 'US,BR',
+        ad_reached_countries: 'US,BR', // Add US as a fallback
         ad_active_status: 'ACTIVE',
         fields: 'id,ad_creation_time,ad_delivery_start_time,ad_creative_bodies,ad_creative_link_titles,status,call_to_action_type,page_id,page_name,ad_creative_link_url,effective_object_story_id,creative{thumbnail_url,video_id,image_url},ad_snapshot_url',
-        limit: isVIP ? '1000' : '100',
+        limit: '1000',
         order_by: 'creation_time_desc'
       })
-  
+
+      // Only add ad_type if it was successful in the first search
       if (initialSearchParams.has('ad_type')) {
         pageSearchParams.append('ad_type', adType)
       }
-  
+
       const pageData = await searchAds(accessToken, pageSearchParams)
-  
+
       return {
         pageId: page.pageId,
         pageName: page.pageName,
@@ -105,7 +110,7 @@ export async function POST(request: Request) {
         }))
       }
     }))
-  
+
     return NextResponse.json({ data: finalResults, totalPages: finalResults.length })
   } catch (error) {
     console.error('Erro ao buscar anúncios:', error)
