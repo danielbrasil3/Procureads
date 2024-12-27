@@ -26,8 +26,6 @@ export default async function CheckoutReturnPage(props: {
   const searchParams = await props.searchParams;
   const sessionId = searchParams?.session_id;
 
-  console.log(sessionId);
-
   if (!sessionId || typeof sessionId !== 'string') {
     return <p>Erro: Alguma coisa aconteceu!</p>;
   }

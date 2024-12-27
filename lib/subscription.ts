@@ -1,16 +1,14 @@
+
 import { auth } from '@/auth';
 import { fetchSubscriptionByEmail } from './stripe';
 
+export async function Subscription() {
+  const session = await auth();
 
-export async function Subscription(){
-    const session = await auth();
+  let subscription = null;
+  if (session?.user?.email) {
+    subscription = await fetchSubscriptionByEmail(session.user.email);
+  }
 
-    if (!session || !session.user) {
-        throw new Error('Session or user is not defined');
-      }
-
-    const email = session.user.email;
-    const subscription = await fetchSubscriptionByEmail(email ?? '');
-    
-    return subscription;
+  return { session, subscription };
 }

@@ -1,15 +1,14 @@
 import Navbar from './navbar';
-import { auth } from '@/auth';
 import db from '@/lib/db';
-import { fetchSubscriptionByEmail } from '@/lib/stripe';
 import { redirect } from 'next/navigation';
+import { Subscription } from '@/lib/subscription';
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const {session, subscription} = await Subscription();
   const user = await db.user.findUnique({
     where: {
       email: session?.user?.email ?? '',
@@ -19,8 +18,6 @@ export default async function DashboardLayout({
   if (!session || !user) {
     redirect('/login');
   }
-
-  const subscription = await fetchSubscriptionByEmail(user.email);
 
   return (
     <div className="min-h-screen ">

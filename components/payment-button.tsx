@@ -1,4 +1,4 @@
-
+'use client'
 
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -6,7 +6,6 @@ import {
   EmbeddedCheckoutProvider,
   EmbeddedCheckout,
 } from '@stripe/react-stripe-js';
-
 import {
   Dialog,
   DialogContent,
@@ -31,12 +30,12 @@ export default function PaymentButton({
 }: PaymentButtonProps) {
   
   const stripePromise = loadStripe(
-    'pk_test_51QXo8oA5TjvYIZXvLjGpmuqxy1VPN3HPdI1Q1HlzU9TPdN0NCI5O5GbOtYvlGKWJlqKuW87rNIjJ1Gt4D6MVQxl200qdVMcPWq'
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ""
   );
 
   const fetchClientSecret = useCallback(async () => {
     // Create a Checkout Session
-    return fetch('/api/checkout/route', {
+    return fetch('/api/checkout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

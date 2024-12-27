@@ -6,7 +6,7 @@ import { ArrowUpRight } from 'lucide-react'
 
 export default function FreePage() {
   return (
-      <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className=" mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-bold mb-8 text-center">Pesquisa de Anúncios Gratuita</h1>
         <Card className="mb-8 shadow-lg">
           <CardHeader className="bg-secondary/10">
@@ -20,7 +20,7 @@ export default function FreePage() {
           </CardContent>
         </Card>
         <div className="text-center mt-8">
-          <Link href="/dashboard/upgrade">
+          <Link href='/dashboard/upgrade'>
             <Button size="lg" className="animate-pulse">
               Faça upgrade para a versão VIP
               <ArrowUpRight className="ml-2 h-4 w-4" />

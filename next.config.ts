@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,
   },
+  
   eslint: {
     ignoreDuringBuilds: true
   },
@@ -19,5 +20,4 @@ const nextConfig: NextConfig = {
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   },
 };
-
 export default nextConfig;

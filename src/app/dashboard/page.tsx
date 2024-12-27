@@ -1,17 +1,11 @@
-import { useState } from 'react';
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, Users, TrendingUp, Zap } from 'lucide-react'
-import { Layout } from "@/components/layout"
-import { fetchSubscriptionByEmail } from '@/lib/stripe';
-import { auth } from '@/auth';
+import { Subscription } from "@/lib/subscription";
 
 export default async function DashboardPage() {
-  const session = await auth();
-  const subscription = await fetchSubscriptionByEmail(
-    session?.user?.email ?? ''
-  );
+  const {session, subscription} = await Subscription();
 
   return (
     <div className="container mx-auto py-4 sm:py-6 md:py-8 px-4 sm:px-6 lg:px-8">

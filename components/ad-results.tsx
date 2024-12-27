@@ -1,197 +1,170 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from 'react'
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { useState, useEffect } from 'react'
-import { ExternalLink, Calendar, Video, ImageIcon, ChevronDown, ChevronUp } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
+import { Checkbox } from "@/components/ui/checkbox"
+import { ExternalLink } from 'lucide-react'
 
 interface Ad {
   id: string
-  title: string
-  body: string
-  status: string
-  callToActionType: string
-  pageId: string
-  pageName: string
-  adLink?: string
-  creationTime: string
-  deliveryStartTime: string
-  creativeType: 'video' | 'image' | 'unknown'
-  creativeContent?: string | null
-  adSnapshotUrl?: string
-}
-
-interface PageGroup {
-  pageId: string
-  pageName: string
-  totalAds: number
-  ads: Ad[]
+  activeAds: number
+  location: "Brasil" | "Latam" | "Internacional"
+  type: "Ebook" | "Video Aula" | "Nutra" | "Drop"
+  hasExpert: boolean
+  landingPageType: "Quiz" | "VSL" | "TSL" | "Checkout Personalizado"
+  link: string
+  creativesLink: string
 }
 
 interface AdResultsProps {
-  pageGroups: PageGroup[]
-  totalPages: number
-  isVIP: boolean
+  isAdmin?: boolean
+  onSendToVIP?: (selectedAds: string[]) => void
 }
 
-export function AdResults({ pageGroups, totalPages, isVIP }: AdResultsProps) {
-  const [expandedPages, setExpandedPages] = useState<Set<string>>(new Set())
+const sampleAds: Ad[] = [
+  {
+    id: "1",
+    activeAds: 147,
+    location: "Brasil",
+    type: "Ebook",
+    hasExpert: false,
+    landingPageType: "Quiz",
+    link: "www.udhdhsh.com",
+    creativesLink: "www.bibliotecadeanuncios.com"
+  },
+  {
+    id: "2",
+    activeAds: 250,
+    location: "Latam",
+    type: "Video Aula",
+    hasExpert: true,
+    landingPageType: "VSL",
+    link: "www.example.com",
+    creativesLink: "www.adlibrary.com"
+  },
+  {
+    id: "3",
+    activeAds: 147,
+    location: "Brasil",
+    type: "Ebook",
+    hasExpert: false,
+    landingPageType: "Quiz",
+    link: "www.udhdhsh.com",
+    creativesLink: "www.bibliotecadeanuncios.com"
+  },
+  {
+    id: "4",
+    activeAds: 250,
+    location: "Latam",
+    type: "Video Aula",
+    hasExpert: true,
+    landingPageType: "VSL",
+    link: "www.example.com",
+    creativesLink: "www.adlibrary.com"
+  },
+  {
+    id: "5",
+    activeAds: 147,
+    location: "Brasil",
+    type: "Ebook",
+    hasExpert: false,
+    landingPageType: "Quiz",
+    link: "www.udhdhsh.com",
+    creativesLink: "www.bibliotecadeanuncios.com"
+  },
+  {
+    id: "6",
+    activeAds: 250,
+    location: "Latam",
+    type: "Video Aula",
+    hasExpert: true,
+    landingPageType: "VSL",
+    link: "www.example.com",
+    creativesLink: "www.adlibrary.com"
+  },
+  // Add more sample ads as needed
+]
 
-  const togglePage = (pageId: string) => {
-    setExpandedPages(prev => {
-      const next = new Set(prev)
-      if (next.has(pageId)) {
-        next.delete(pageId)
-      } else {
-        next.add(pageId)
-      }
-      return next
-    })
+export function AdResults({ isAdmin = false, onSendToVIP }: AdResultsProps) {
+  const [selectedAds, setSelectedAds] = useState<string[]>([])
+
+  const handleAdSelection = (adId: string) => {
+    setSelectedAds(prev => 
+      prev.includes(adId) ? prev.filter(id => id !== adId) : [...prev, adId]
+    )
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+  const handleSendToVIP = () => {
+    if (onSendToVIP) {
+      onSendToVIP(selectedAds)
+    }
   }
-
-  const limitedPageGroups = isVIP ? pageGroups : pageGroups.slice(0, 3).map(group => ({
-    ...group,
-    ads: group.ads.slice(0, 5)
-  }));
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="md:text-3xl text-xl font-bold">Resultados por Página</h2>
-        <p className="md:text-lg text-sm text-muted-foreground">Total de Páginas: {totalPages}</p>
-      </div>
-      <div className="space-y-4">
-        {limitedPageGroups.map((group) => (
-          <Card key={group.pageId}>
-            <CardHeader className="cursor-pointer" onClick={() => togglePage(group.pageId)}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-sm md:text-lg">{group.pageName}</CardTitle>
-                  <CardDescription className="text-xs md:text-sm">Total de Anúncios: {group.totalAds}</CardDescription>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {sampleAds.map((ad) => (
+          <Card key={ad.id} className={ad.activeAds > 50 ? "bg-gradient-to-t from-green-600/50" : ""}>
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start">
+                <div className="space-y-4 flex-grow">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-bold">Anúncios ativos:</h2>
+                    <span className="text-2xl font-semibold">{ad.activeAds}</span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="font-medium">Titulo:</span>
+                      <span>{ad.location}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Descrição:</span>
+                      <span>{ad.type}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Local:</span>
+                      <span>{ad.hasExpert ? "Sim" : "Não"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium">Landing Page:</span>
+                      <span>{ad.landingPageType}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Button variant="outline" className="w-full" asChild>
+                      <a href={ad.link} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Link Landing Page
+                      </a>
+                    </Button>
+                    <Button variant="outline" className="w-full" asChild>
+                      <a href={ad.creativesLink} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Criativos
+                      </a>
+                    </Button>
+                  </div>
                 </div>
-                {expandedPages.has(group.pageId) ? (
-                  <ChevronUp className="h-6 w-6" />
-                ) : (
-                  <ChevronDown className="h-6 w-6" />
+                {isAdmin && (
+                  <div className="ml-4">
+                    <Checkbox
+                      checked={selectedAds.includes(ad.id)}
+                      onCheckedChange={() => handleAdSelection(ad.id)}
+                    />
+                  </div>
                 )}
               </div>
-            </CardHeader>
-            {expandedPages.has(group.pageId) && (
-              <CardContent>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {group.ads.map((ad) => (
-                    <Card key={ad.id} className="flex flex-col">
-                      <CardHeader>
-                        <CardTitle className="text-lg">{ad.title}</CardTitle>
-                        <CardDescription>ID: {ad.id}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="flex-grow">
-                        <p className="text-sm text-muted-foreground mb-4">{ad.body}</p>
-                        
-                        {ad.creativeContent && (
-                          <div className="mb-4 relative">
-                            {ad.creativeType === 'video' ? (
-                              <Button variant="outline" size="sm" className="w-full" asChild>
-                                <a href={ad.creativeContent} target="_blank" rel="noopener noreferrer">
-                                  <Video className="w-4 h-4 mr-2" />
-                                  Ver Vídeo
-                                </a>
-                              </Button>
-                            ) : ad.creativeType === 'image' ? (
-                              <Image
-                                src={ad.creativeContent}
-                                alt={ad.title}
-                                width={300}
-                                height={200}
-                                className="w-full h-auto object-cover rounded-md"
-                              />
-                            ) : null}
-                          </div>
-                        )}
-
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div>
-                            <p className="font-semibold">Formato</p>
-                            <p>{ad.creativeType === 'video' ? 'Vídeo' : 
-                                ad.creativeType === 'image' ? 'Imagem' : 'N/A'}</p>
-                          </div>
-                          <div>
-                            <p className="font-semibold">Tipo Criativo</p>
-                            <p>{ad.callToActionType || 'N/A'}</p>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2 mb-4">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
-                            <p className="text-sm">Criação: {formatDate(ad.creationTime)}</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" />
-                            <p className="text-sm">Entrega: {formatDate(ad.deliveryStartTime)}</p>
-                          </div>
-                        </div>
-
-                        {isVIP && (
-                          <div className="mt-2 text-sm text-gray-600">
-                            <p>Status: {ad.status}</p>
-                            <p>Tipo de CTA: {ad.callToActionType}</p>
-                          </div>
-                        )}
-
-                        <div className="flex flex-col gap-2">
-                          {ad.adLink && (
-                            <Button variant="outline" size="sm" className="w-full" asChild>
-                              <a href={ad.adLink} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="w-4 h-4 mr-2" />
-                                Ver Anúncio
-                              </a>
-                            </Button>
-                          )}
-                          {ad.adSnapshotUrl && (
-                            <Button variant="outline" size="sm" className="w-full" asChild>
-                              <a href={ad.adSnapshotUrl} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="w-4 h-4 mr-2" />
-                                Ver Snapshot do Anúncio
-                              </a>
-                            </Button>
-                          )}
-                          <Button variant="default" size="sm" className="w-full" asChild>
-                            <a href={`https://www.facebook.com/ads/library/?id=${ad.id}`} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="w-4 h-4 mr-2" />
-                              Ver na Biblioteca de Anúncios
-                            </a>
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            )}
+            </CardContent>
           </Card>
         ))}
       </div>
-      {!isVIP && (
-        <div className="mt-8 p-4 bg-blue-100 rounded-lg text-center">
-          <p className="text-blue-800 mb-2">Veja mais anúncios e detalhes com a versão VIP!</p>
-          <Link href="/upgrade">
-            <Button variant="outline">Faça upgrade para VIP</Button>
-          </Link>
-        </div>
+      {isAdmin && (
+        <Button onClick={handleSendToVIP} disabled={selectedAds.length === 0}>
+          Send Selected Ads to VIP Dashboard
+        </Button>
       )}
     </div>
   )

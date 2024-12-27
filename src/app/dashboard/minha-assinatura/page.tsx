@@ -4,29 +4,21 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-  } from '@/components/ui/card';
-  import { CreditCard, XCircle } from 'lucide-react';
-  import {
-    fetchSubscription,
+} from '@/components/ui/card';
+import { CreditCard, XCircle } from 'lucide-react';
+import {
     translateSubscriptionInterval,
     translateSubscriptionStatus,
-  } from '@/lib/stripe';
-  import BannerWarning from '@/components/banner-warning';
-  import PricingCard from '@/components/pricingcard';
-  import { auth } from '@/auth';
-  import cancelSubscriptionAction from './cancel-subscription-action';
-  import Form from 'next/form';
-  import Link from 'next/link';
+} from '@/lib/stripe';
+import BannerWarning from '@/components/banner-warning';
+import PricingCard from '@/components/pricingcard';
+import cancelSubscriptionAction from './cancel-subscription-action';
+import Form from 'next/form';
+import Link from 'next/link';
+import { Subscription } from '@/lib/subscription';
   
   export default async function MySubscription() {
-    const session = await auth();
-  
-    let subscription = null;
-  
-    if (session?.user?.email) {
-      const email = session?.user?.email; // Replace with the actual email
-      subscription = await fetchSubscription(email);
-    }
+    const { session, subscription } = await Subscription();
   
     return (
       <>
@@ -40,7 +32,7 @@ import {
         {!subscription && (
           <>
             <BannerWarning text="Você precisa de uma assinatura ativa. Quer tal assinar agora?" />
-            <PricingCard />
+            <PricingCard session={session} subscription={subscription} />
           </>
         )}
       </>

@@ -2,24 +2,7 @@
 import { stripe } from '../src/app/utils/stripe_key';
 
 
-export async function fetchSubscription(email: string) {
-  const customers = await stripe.customers.list({ email });
 
-  if (customers.data.length === 0) {
-    return null;
-  }
-
-  const customer = customers.data[0];
-  const subscriptions = await stripe.subscriptions.list({
-    customer: customer.id,
-  });
-
-  if (subscriptions.data.length === 0) {
-    return null;
-  }
-
-  return subscriptions.data[0];
-}
 
 export async function fetchSubscriptionByEmail(email: string) {
   const customers = await stripe.customers.list({

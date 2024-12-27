@@ -21,9 +21,9 @@ async function searchAds(accessToken: string, searchParams: URLSearchParams) {
 
 export async function POST(request: Request) {
   try {
-    const { searchTerm, adType = 'FINANCIAL_PRODUCTS_AND_SERVICES_ADS', isVIP } = await request.json()
+    const { searchTerm, language, isVIP } = await request.json()
     
-    console.log('Parâmetros de busca:', { searchTerm, adType, isVIP })
+    console.log('Parâmetros de busca:', { searchTerm, language, isVIP })
   
     const accessToken = process.env.FACEBOOK_ACCESS_TOKEN
   
@@ -34,20 +34,20 @@ export async function POST(request: Request) {
     const initialSearchParams = new URLSearchParams({
       access_token: accessToken,
       search_terms: searchTerm,
-      ad_type: adType,
-      ad_reached_countries: 'US,BR',
+      ad_reached_countries: 'BR',
       ad_active_status: 'ACTIVE',
       fields: 'id,page_id,page_name',
       limit: isVIP ? '1000' : '100', // Limit results for free users
-      order_by: 'creation_time_desc'
+      order_by: 'creation_time_desc',
+      languages: language, // Adicionando filtro de idioma
     })
     
     let initialData
     try {
       initialData = await searchAds(accessToken, initialSearchParams)
     } catch (error) {
-      console.log('Primeira tentativa falhou, tentando sem ad_type')
-      initialSearchParams.delete('ad_type')
+      console.log('Primeira tentativa falhou, tentando sem languages')
+      initialSearchParams.delete('languages')
       initialData = await searchAds(accessToken, initialSearchParams)
     }
     
@@ -69,16 +69,13 @@ export async function POST(request: Request) {
       const pageSearchParams = new URLSearchParams({
         access_token: accessToken,
         search_page_ids: page.pageId,
-        ad_reached_countries: 'US,BR',
+        ad_reached_countries: 'BR',
         ad_active_status: 'ACTIVE',
         fields: 'id,ad_creation_time,ad_delivery_start_time,ad_creative_bodies,ad_creative_link_titles,status,call_to_action_type,page_id,page_name,ad_creative_link_url,effective_object_story_id,creative{thumbnail_url,video_id,image_url},ad_snapshot_url',
         limit: isVIP ? '1000' : '100',
-        order_by: 'creation_time_desc'
+        order_by: 'creation_time_desc',
+        languages: language, // Adicionando filtro de idioma
       })
-  
-      if (initialSearchParams.has('ad_type')) {
-        pageSearchParams.append('ad_type', adType)
-      }
   
       const pageData = await searchAds(accessToken, pageSearchParams)
   
@@ -112,4 +109,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Erro ao buscar anúncios' }, { status: 500 })
   }
 }
-

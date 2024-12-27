@@ -1,8 +1,5 @@
-'use client'
-
-import { memo, useMemo, useState, useEffect } from 'react'
-import { Check } from 'lucide-react'
-import PaymentButton from './payment-button'
+// pricingcard.tsx
+import PaymentButton from './payment-button';
 import {
   Card,
   CardContent,
@@ -10,59 +7,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from './ui/card'
-import { Subscription } from '@/lib/subscription'
-import { auth } from '@/auth'
+} from './ui/card';
 
-const PlanItems = memo(() => (
-  <ul className="space-y-2">
-    <li className="flex gap-2 text-muted-foreground">
-      <Check className="w-4 text-green-600 shrink-0" />
-      Acesso a 1 ebook por mês
-    </li>
-    <li className="flex gap-2 text-muted-foreground">
-      <Check className="w-4 text-green-600 shrink-0" />
-      Curadoria especial
-    </li>
-    <li className="flex gap-2 text-muted-foreground">
-      <Check className="w-4 text-green-600 shrink-0" />
-      Acesso ilimitado
-    </li>
-    <li className="flex gap-2 text-muted-foreground">
-      <Check className="w-4 text-green-600 shrink-0" />
-      Cancele quando quiser
-    </li>
-  </ul>
-))
-PlanItems.displayName = 'PlanItems'
-
-export default function PricingCard() {
-  const [subscription, setSubscription] = useState<any>(null)
-  const [session, setSession] = useState<any>(null)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const subscriptionData = await Subscription()
-      const sessionData = await auth()
-
-      setSubscription(subscriptionData)
-      setSession(sessionData)
-    }
-
-    fetchData()
-  }, [])
-
-  // Use useMemo to avoid unnecessary recomputation of the renderButton
-  const renderButton = useMemo(() => {
-    if (subscription) return null
-    
-    return (
-      <PaymentButton isLoggedIn={!!session} className="w-full">
-        Assine Agora
-      </PaymentButton>
-    )
-  }, [session, subscription])
-
+export default function PricingCard({
+  session,
+  subscription,
+}: {
+  session: any;
+  subscription: any;
+}) {
   return (
     <Card className="text-left md:mt-6 mt-4">
       <CardHeader>
@@ -78,11 +31,28 @@ export default function PricingCard() {
             /mês
           </span>
         </p>
-        <PlanItems />
+        <ul className="space-y-2">
+          <li className="flex gap-2 text-muted-foreground">
+            Acesso a 1 ebook por mês
+          </li>
+          <li className="flex gap-2 text-muted-foreground">
+            Curadoria especial
+          </li>
+          <li className="flex gap-2 text-muted-foreground">
+            Acesso ilimitado
+          </li>
+          <li className="flex gap-2 text-muted-foreground">
+            Cancele quando quiser
+          </li>
+        </ul>
       </CardContent>
       <CardFooter>
-        {renderButton}
+        {!subscription && (
+          <PaymentButton isLoggedIn={!!session} className="w-full">
+            Assine Agora
+          </PaymentButton>
+        )}
       </CardFooter>
     </Card>
-  )
+  );
 }

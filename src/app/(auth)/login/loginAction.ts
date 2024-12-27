@@ -2,7 +2,6 @@
 
 import { signIn } from '@/auth';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
-import { redirect } from 'next/navigation';
 
 export default async function loginAction(_prevState: any, formData: FormData) {
   try {

@@ -1,7 +1,3 @@
-// page.tsx - Revisado com autenticação original e otimizações específicas para Next.js
-import dotenv from 'dotenv';
-dotenv.config(); // Carrega o arquivo .env
-
 import Link from 'next/link';
 import { Suspense, lazy } from 'react';
 import { Button } from "@/components/ui/button";
@@ -15,18 +11,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '@/components/theme-toggle';
+import PricingCard from '@/components/pricingcard';
 import { Subscription } from '@/lib/subscription';
 
-const PricingCard = lazy(() => import('@/components/pricingcard'));
-
 export default async function LandingPage() {
-  const subscription = await Subscription()
+  const { session, subscription } = await Subscription();
 
   return (
     <main className="bg-background/10 text-foreground">
       <section className="container mx-auto text-center pb-20 px-4 md:px-0">
         <nav className="flex justify-between items-center py-6">
-          <div className='flex gap-4'>
+          <div className="flex gap-4">
             <Link href="/" className="flex items-center justify-center ml-5">
               <span className="font-bold text-2xl ">Procure Ads</span>
             </Link>
@@ -59,12 +54,11 @@ export default async function LandingPage() {
             <Link href="#preco">
               <Button variant="link">Preço</Button>
             </Link>
-            {subscription && (
+            {subscription ? (
               <Link href="/dashboard">
                 <Button>Dashboard</Button>
               </Link>
-            )}
-            {!subscription && (
+            ) : (
               <Link href="/login">
                 <Button>Login</Button>
               </Link>
@@ -73,7 +67,7 @@ export default async function LandingPage() {
         </nav>
         <section>
           <h1 className="md:text-6xl text-3xl font-bold md:font-bold mt-16 md:mt-24 leading-tight">
-            Descubra os Anúncios Mais Escalados <br/> no Meta Ads
+            Descubra os Anúncios Mais Escalados <br /> no Meta Ads
           </h1>
           <p className="text-muted-foreground mt-6 text-base md:text-xl max-w-3xl mx-auto">
             Otimize suas campanhas no Facebook e Instagram com insights poderosos dos anúncios de maior sucesso no mercado.
@@ -83,7 +77,7 @@ export default async function LandingPage() {
               <Button size="lg" className="w-full sm:w-auto">
                 Comece Gratuitamente <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
-            </Link>       
+            </Link>
             <Link href="/login">
               <Button variant="outline" size="lg" className="w-full sm:w-auto">
                 Já tenho uma conta
@@ -147,7 +141,7 @@ export default async function LandingPage() {
         </p>
         <div className="flex justify-center">
           <Suspense fallback={<div>Loading...</div>}>
-            <PricingCard />
+            <PricingCard session={session} subscription={subscription} />
           </Suspense>
         </div>
       </section>

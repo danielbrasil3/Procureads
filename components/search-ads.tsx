@@ -5,14 +5,14 @@ import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger,SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AdResults } from "./ad-results"
 import { Search, Loader2 } from 'lucide-react'
 import { useSession } from "next-auth/react"
 
 interface SearchForm {
   searchTerm: string
-  adType: string
+  language: string
 }
 
 export function SearchAds({ isVip = false }) {
@@ -22,7 +22,7 @@ export function SearchAds({ isVip = false }) {
   const [error, setError] = useState<string | null>(null)
   const { data: session } = useSession()
 
-  const { register, handleSubmit, formState: { errors } } = useForm<SearchForm>()
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<SearchForm>()
 
   const onSubmit = async (data: SearchForm) => {
     try {
@@ -68,16 +68,15 @@ export function SearchAds({ isVip = false }) {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="adType">Tipo de Anúncio</Label>
-            <Select defaultValue="FINANCIAL_PRODUCTS_AND_SERVICES_ADS" onValueChange={(value) => register("adType").onChange({ target: { value } })}>
+            <Label htmlFor="language">Idioma</Label>
+            <Select onValueChange={(value) => setValue("language", value)} {...register("language", { required: true })}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o tipo de anúncio" />
+                <SelectValue placeholder="Selecione o idioma" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="FINANCIAL_PRODUCTS_AND_SERVICES_ADS">Produtos e Serviços Financeiros</SelectItem>
-                <SelectItem value="HOUSING_ADS">Imóveis</SelectItem>
-                <SelectItem value="EMPLOYMENT_ADS">Empregos</SelectItem>
-                <SelectItem value="POLITICAL_AND_ISSUE_ADS">Políticos e de Interesse Público</SelectItem>
+                <SelectItem value="pt">Português</SelectItem>
+                <SelectItem value="en">Inglês</SelectItem>
+                <SelectItem value="es">Espanhol</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -113,4 +112,3 @@ export function SearchAds({ isVip = false }) {
     </div>
   )
 }
-

@@ -21,3 +21,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
 });
+
+
+export async function handleError(error: unknown) {
+  console.error('Auth route error:', error);
+  return new Response('Internal Server Error', { status: 500 });
+}
